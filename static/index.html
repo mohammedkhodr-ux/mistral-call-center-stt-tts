@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Dubai - Government Services Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-group">
+                    <svg class="logo-icon" viewBox="0 0 40 40" width="40" height="40">
+                        <rect width="40" height="40" rx="8" fill="#1A237E"/>
+                        <text x="20" y="26" text-anchor="middle" fill="#00BCD4" font-size="18" font-weight="700" font-family="Inter, sans-serif">DD</text>
+                    </svg>
+                    <div class="logo-text">
+                        <span class="logo-title" data-i18n="title">Digital Dubai</span>
+                        <span class="logo-subtitle" data-i18n="subtitle">Government Services Assistant</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="lang-toggle" class="btn-lang" title="Switch language">
+                    <span id="lang-label">AR</span>
+                </button>
+                <button id="btn-reset" class="btn-icon" title="New conversation">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="1 4 1 10 7 10"></polyline>
+                        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Chat Area -->
+        <main class="chat-area" id="chat-area">
+            <div class="welcome-message" id="welcome">
+                <div class="welcome-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00BCD4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                </div>
+                <h2 data-i18n="welcome_title">Welcome to Digital Dubai</h2>
+                <p data-i18n="welcome_desc">I can help you with Dubai government services. Ask me about DubaiNow, UAE PASS, visa services, fine payments, and more.</p>
+                <div class="quick-actions">
+                    <button class="quick-btn" data-msg="How do I pay a traffic fine using DubaiNow?" data-i18n="quick_1">Pay a traffic fine</button>
+                    <button class="quick-btn" data-msg="How do I register for UAE PASS?" data-i18n="quick_2">Register for UAE PASS</button>
+                    <button class="quick-btn" data-msg="What services are available on DubaiNow?" data-i18n="quick_3">DubaiNow services</button>
+                    <button class="quick-btn" data-msg="How can I apply for a job in Dubai government?" data-i18n="quick_4">Government jobs</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Input Area -->
+        <footer class="input-area">
+            <div class="input-row">
+                <button id="btn-mic" class="btn-mic" title="Voice input">
+                    <svg id="mic-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                    <div id="mic-pulse" class="mic-pulse hidden"></div>
+                </button>
+                <div class="input-wrapper">
+                    <textarea id="msg-input" rows="1" placeholder="Type your message..." data-i18n-placeholder="input_placeholder"></textarea>
+                </div>
+                <button id="btn-send" class="btn-send" title="Send message">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-footer">
+                <span class="powered-by">Powered by Mistral AI</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Audio element for TTS playback -->
+    <audio id="tts-audio" style="display:none"></audio>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
