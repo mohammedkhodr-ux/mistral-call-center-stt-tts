@@ -45,6 +45,10 @@ export MISTRAL_API_KEY="your-api-key-here"
 python app.py
 ```
 
+**Troubleshooting:** If you see import errors, make sure you are running
+inside the virtual environment (`source .venv/bin/activate`). The app uses
+`httpx` for direct HTTP calls to the Mistral API -- no SDK version conflicts.
+
 Open [http://localhost:8000](http://localhost:8000) in your browser.
 
 ## Configuration

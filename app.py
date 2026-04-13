@@ -4,15 +4,16 @@ Backend powered by Mistral AI (Chat, STT, TTS)
 """
 
 import base64
+import json
 import os
 import tempfile
 from pathlib import Path
 
+import httpx
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from mistralai.client import Mistral
 from pydantic import BaseModel
 
 app = FastAPI(title="Digital Dubai Agent")
@@ -25,10 +26,11 @@ app.add_middleware(
 )
 
 MISTRAL_API_KEY = os.environ.get("MISTRAL_API_KEY", "")
+MISTRAL_BASE_URL = "https://api.mistral.ai/v1"
 CHAT_MODEL = os.environ.get("CHAT_MODEL", "mistral-medium-latest")
 STT_MODEL = os.environ.get("STT_MODEL", "mistral-stt-latest")
 TTS_MODEL = os.environ.get("TTS_MODEL", "mistral-tts-latest")
-TTS_VOICE = os.environ.get("TTS_VOICE", "")  # Leave empty to use default
+TTS_VOICE = os.environ.get("TTS_VOICE", "")
 
 SYSTEM_PROMPT = """You are the Digital Dubai Authority virtual assistant. You help citizens and residents of Dubai with government services, information, and guidance.
 
@@ -57,13 +59,10 @@ Guidelines:
 """
 
 
-def get_client() -> Mistral:
+def _headers():
     if not MISTRAL_API_KEY:
-        raise HTTPException(
-            status_code=500,
-            detail="MISTRAL_API_KEY environment variable is not set",
-        )
-    return Mistral(api_key=MISTRAL_API_KEY)
+        raise HTTPException(status_code=500, detail="MISTRAL_API_KEY not set")
+    return {"Authorization": f"Bearer {MISTRAL_API_KEY}"}
 
 
 # ── Chat ────────────────────────────────────────────────────────────────
@@ -79,10 +78,17 @@ class ChatResponse(BaseModel):
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
-    client = get_client()
     messages = [{"role": "system", "content": SYSTEM_PROMPT}] + req.messages
-    resp = client.chat.complete(model=CHAT_MODEL, messages=messages)
-    reply = resp.choices[0].message.content
+    async with httpx.AsyncClient(timeout=60) as client:
+        resp = await client.post(
+            f"{MISTRAL_BASE_URL}/chat/completions",
+            headers={**_headers(), "Content-Type": "application/json"},
+            json={"model": CHAT_MODEL, "messages": messages},
+        )
+    if resp.status_code != 200:
+        raise HTTPException(status_code=resp.status_code, detail=resp.text)
+    data = resp.json()
+    reply = data["choices"][0]["message"]["content"]
     return ChatResponse(reply=reply)
 
 
@@ -91,27 +97,23 @@ async def chat(req: ChatRequest):
 
 @app.post("/api/stt")
 async def speech_to_text(audio: UploadFile = File(...)):
-    client = get_client()
     audio_bytes = await audio.read()
-
-    # Write to a temp file so we can pass it to the SDK
     suffix = Path(audio.filename or "audio.webm").suffix or ".webm"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        tmp.write(audio_bytes)
-        tmp_path = tmp.name
+    mime_map = {".webm": "audio/webm", ".ogg": "audio/ogg", ".mp4": "audio/mp4",
+                ".wav": "audio/wav", ".mp3": "audio/mpeg", ".flac": "audio/flac"}
+    content_type = mime_map.get(suffix, "audio/webm")
 
-    try:
-        with open(tmp_path, "rb") as f:
-            result = client.audio.transcriptions.complete(
-                model=STT_MODEL,
-                file={
-                    "file_name": f"recording{suffix}",
-                    "content": f,
-                },
-            )
-        return {"text": result.text}
-    finally:
-        os.unlink(tmp_path)
+    async with httpx.AsyncClient(timeout=120) as client:
+        resp = await client.post(
+            f"{MISTRAL_BASE_URL}/audio/transcriptions",
+            headers=_headers(),
+            files={"file": (f"recording{suffix}", audio_bytes, content_type)},
+            data={"model": STT_MODEL},
+        )
+    if resp.status_code != 200:
+        raise HTTPException(status_code=resp.status_code, detail=resp.text)
+    data = resp.json()
+    return {"text": data.get("text", "")}
 
 
 # ── Text-to-Speech ──────────────────────────────────────────────────────
@@ -123,18 +125,20 @@ class TTSRequest(BaseModel):
 
 @app.post("/api/tts")
 async def text_to_speech(req: TTSRequest):
-    client = get_client()
-
-    kwargs = {
-        "model": TTS_MODEL,
-        "input": req.text,
-    }
+    body: dict = {"model": TTS_MODEL, "input": req.text}
     if TTS_VOICE:
-        kwargs["voice_id"] = TTS_VOICE
+        body["voice_id"] = TTS_VOICE
 
-    result = client.audio.speech.complete(**kwargs)
-    audio_b64 = result.audio_data
-    return {"audio": audio_b64}
+    async with httpx.AsyncClient(timeout=120) as client:
+        resp = await client.post(
+            f"{MISTRAL_BASE_URL}/audio/speech",
+            headers={**_headers(), "Content-Type": "application/json"},
+            json=body,
+        )
+    if resp.status_code != 200:
+        raise HTTPException(status_code=resp.status_code, detail=resp.text)
+    data = resp.json()
+    return {"audio": data.get("audio_data", "")}
 
 
 # ── Static files & SPA fallback ─────────────────────────────────────────
