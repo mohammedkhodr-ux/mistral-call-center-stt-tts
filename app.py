@@ -15,14 +15,17 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from mistralai.client import Mistral
+
+try:
+    from mistralai.client import Mistral
+except ImportError:
+    from mistralai import Mistral
 
 from config import AppConfig, load_config, save_config
 
 app = FastAPI(title="DDA Voice Chat Agent", version="1.0.0")
 
 BASE_DIR = Path(__file__).parent
-app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory=BASE_DIR / "templates")
 
 UPLOAD_DIR = BASE_DIR / "uploads"
@@ -39,18 +42,33 @@ def get_client() -> Mistral:
     return Mistral(api_key=api_key)
 
 
+def render_template(request: Request, name: str, context: dict):
+    """Render a Jinja2 template, compatible with both old and new Starlette."""
+    context["request"] = request
+    try:
+        # Starlette >= 1.0
+        return templates.TemplateResponse(request, name, context)
+    except TypeError:
+        # Starlette < 1.0
+        return templates.TemplateResponse(name, context)
+
+
 # ─── Page Routes ───────────────────────────────────────────────────────────────
 
 @app.get("/", response_class=HTMLResponse)
 async def citizen_page(request: Request):
     config = load_config()
-    return templates.TemplateResponse(request, "citizen.html", {"config": config})
+    return render_template(request, "citizen.html", {"config": config})
 
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):
     config = load_config()
-    return templates.TemplateResponse(request, "admin.html", {"config": config})
+    return render_template(request, "admin.html", {"config": config})
+
+
+# Mount static files AFTER route definitions so routes take priority
+app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 
 # ─── Config API ────────────────────────────────────────────────────────────────
@@ -344,6 +362,22 @@ async def list_models():
     models = client.models.list()
     model_list = [{"id": m.id, "owned_by": getattr(m, "owned_by", "")} for m in models.data]
     return {"models": model_list}
+
+
+# ─── Debug: list all routes on startup ────────────────────────────────────────
+
+@app.on_event("startup")
+async def startup_event():
+    print("\n=== DDA Voice Chat Agent ===")
+    print("Routes registered:")
+    for route in app.routes:
+        if hasattr(route, "methods"):
+            print(f"  {', '.join(route.methods):8s} {route.path}")
+        elif hasattr(route, "path"):
+            print(f"  {'MOUNT':8s} {route.path}")
+    print(f"\nCitizen UI:  http://localhost:8000/")
+    print(f"Admin Panel: http://localhost:8000/admin")
+    print("============================\n")
 
 
 if __name__ == "__main__":
