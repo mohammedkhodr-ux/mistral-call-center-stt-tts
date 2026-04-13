@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="{{ config.language }}" dir="{{ 'rtl' if config.language == 'ar' else 'ltr' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Dubai Authority - Government Services Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/common.css">
+  <link rel="stylesheet" href="/static/css/citizen.css">
+</head>
+<body class="{{ 'rtl' if config.language == 'ar' else '' }}">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">DD</div>
+      <div>
+        <div class="header-title" id="headerTitle">Digital Dubai Authority</div>
+        <div class="header-subtitle" id="headerSubtitle">Government Services Assistant</div>
+      </div>
+    </div>
+    <div class="header-nav">
+      <div class="lang-toggle">
+        <button id="langEn" class="{{ 'active' if config.language == 'en' else '' }}" onclick="setLanguage('en')">EN</button>
+        <button id="langAr" class="{{ 'active' if config.language == 'ar' else '' }}" onclick="setLanguage('ar')">AR</button>
+      </div>
+      <a href="/admin">Admin</a>
+    </div>
+  </header>
+
+  <!-- Chat Container -->
+  <div class="chat-container">
+
+    <!-- Welcome Banner -->
+    <div class="welcome-banner" id="welcomeBanner">
+      <h2 id="welcomeTitle">Welcome to Digital Dubai</h2>
+      <p id="welcomeDesc">How can I help you with government services today?</p>
+      <div class="welcome-services">
+        <span class="service-chip" onclick="quickAsk(this.textContent)" id="svc1">Visa Services</span>
+        <span class="service-chip" onclick="quickAsk(this.textContent)" id="svc2">Business License</span>
+        <span class="service-chip" onclick="quickAsk(this.textContent)" id="svc3">Utility Payments</span>
+        <span class="service-chip" onclick="quickAsk(this.textContent)" id="svc4">Housing</span>
+        <span class="service-chip" onclick="quickAsk(this.textContent)" id="svc5">Healthcare</span>
+        <span class="service-chip" onclick="quickAsk(this.textContent)" id="svc6">Education</span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messagesArea"></div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+      <div class="input-row">
+        <button class="voice-btn" id="voiceBtn" onclick="toggleRecording()" title="Hold to speak">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <div class="input-wrapper">
+          <textarea id="messageInput" placeholder="Type your message..." rows="1"
+                    onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/static/js/citizen.js"></script>
+</body>
+</html>

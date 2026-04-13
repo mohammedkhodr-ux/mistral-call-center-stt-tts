@@ -1,0 +1,5 @@
+config.json
+uploads/
+__pycache__/
+venv/
+*.pyc

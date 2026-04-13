@@ -1,0 +1,297 @@
+/* ─── Admin Panel Layout ─────────────────────────────────────────────────── */
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: calc(100vh - 64px);
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────────────────── */
+
+.admin-sidebar {
+  background: white;
+  border-right: 1px solid var(--dda-border);
+  padding: 20px 0;
+}
+
+.sidebar-section {
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.sidebar-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--dda-text-light);
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--dda-text);
+  transition: var(--transition);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.sidebar-item:hover {
+  background: var(--dda-bg);
+}
+
+.sidebar-item.active {
+  background: rgba(0,164,228,0.1);
+  color: var(--dda-blue);
+  font-weight: 500;
+}
+
+.sidebar-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ─── Main Content ───────────────────────────────────────────────────────── */
+
+.admin-content {
+  padding: 24px 32px;
+  overflow-y: auto;
+  max-height: calc(100vh - 64px);
+}
+
+.admin-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.admin-page-desc {
+  font-size: 14px;
+  color: var(--dda-text-light);
+  margin-bottom: 24px;
+}
+
+/* ─── Config Panels ──────────────────────────────────────────────────────── */
+
+.config-section {
+  display: none;
+}
+
+.config-section.active {
+  display: block;
+}
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.config-grid .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* ─── Range with Value ───────────────────────────────────────────────────── */
+
+.range-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range-group input[type="range"] {
+  flex: 1;
+}
+
+.range-value {
+  min-width: 48px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dda-blue);
+  background: rgba(0,164,228,0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* ─── Test Panel ─────────────────────────────────────────────────────────── */
+
+.test-panel {
+  margin-top: 20px;
+}
+
+.test-result {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--dda-bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--dda-border);
+  font-size: 14px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.test-result.error {
+  border-color: var(--dda-error);
+  color: var(--dda-error);
+  background: rgba(239,68,68,0.05);
+}
+
+.test-result-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dda-text-light);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Voice Recording ────────────────────────────────────────────────────── */
+
+.voice-recorder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  border: 2px dashed var(--dda-border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.voice-recorder.recording {
+  border-color: var(--dda-error);
+  background: rgba(239,68,68,0.03);
+}
+
+.record-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: var(--dda-navy);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.record-btn.recording {
+  background: var(--dda-error);
+  animation: pulse 1.5s infinite;
+}
+
+.record-btn svg {
+  width: 28px;
+  height: 28px;
+}
+
+.voice-status {
+  font-size: 14px;
+  color: var(--dda-text-light);
+}
+
+.voice-status.has-voice {
+  color: var(--dda-success);
+  font-weight: 500;
+}
+
+/* ─── Usage Stats ────────────────────────────────────────────────────────── */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.stat-card {
+  padding: 16px;
+  background: var(--dda-bg);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dda-blue);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--dda-text-light);
+  margin-top: 4px;
+}
+
+/* ─── File Upload ────────────────────────────────────────────────────────── */
+
+.file-upload-area {
+  border: 2px dashed var(--dda-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.file-upload-area:hover {
+  border-color: var(--dda-blue);
+  background: rgba(0,164,228,0.03);
+}
+
+.file-upload-area input[type="file"] {
+  display: none;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+  }
+  .admin-sidebar {
+    display: flex;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--dda-border);
+    padding: 12px 16px;
+  }
+  .sidebar-section {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    padding: 0;
+  }
+  .sidebar-section-title {
+    display: none;
+  }
+  .sidebar-item {
+    white-space: nowrap;
+    padding: 8px 14px;
+  }
+  .config-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-content {
+    padding: 20px 16px;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
