@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DDA Admin - Configuration Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/common.css">
+  <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">DD</div>
+      <div>
+        <div class="header-title">DDA Admin Panel</div>
+        <div class="header-subtitle">Configuration & Testing</div>
+      </div>
+    </div>
+    <div class="header-nav">
+      <a href="/">Citizen View</a>
+      <a href="/admin" class="active">Admin</a>
+    </div>
+  </header>
+
+  <!-- Admin Layout -->
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <nav class="admin-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Configuration</div>
+        <button class="sidebar-item active" onclick="showSection('models', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Model Settings
+        </button>
+        <button class="sidebar-item" onclick="showSection('tts', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          TTS Settings
+        </button>
+        <button class="sidebar-item" onclick="showSection('stt', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          STT Settings
+        </button>
+        <button class="sidebar-item" onclick="showSection('prompts', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          System Prompts
+        </button>
+        <button class="sidebar-item" onclick="showSection('voice', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          Voice Recording
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">Testing</div>
+        <button class="sidebar-item" onclick="showSection('test-chat', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Test Chat
+        </button>
+        <button class="sidebar-item" onclick="showSection('test-tts', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+          Test TTS
+        </button>
+        <button class="sidebar-item" onclick="showSection('test-stt', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          Test STT
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="admin-content">
+
+      <!-- ═══ Model Settings ═══ -->
+      <div id="section-models" class="config-section active">
+        <h1 class="admin-page-title">Model Settings</h1>
+        <p class="admin-page-desc">Configure the AI models and generation parameters.</p>
+
+        <div class="card">
+          <div class="card-header">Model Selection</div>
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="form-group">
+                <label class="form-label">Chat Model</label>
+                <select id="cfg-chat-model">
+                  <option value="mistral-small-latest">mistral-small-latest</option>
+                  <option value="mistral-medium-latest">mistral-medium-latest</option>
+                  <option value="mistral-large-latest">mistral-large-latest</option>
+                  <option value="open-mistral-nemo">open-mistral-nemo</option>
+                  <option value="codestral-latest">codestral-latest</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Language</label>
+                <select id="cfg-language">
+                  <option value="en">English</option>
+                  <option value="ar">Arabic</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">Generation Parameters</div>
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="form-group">
+                <label class="form-label">Temperature</label>
+                <div class="range-group">
+                  <input type="range" id="cfg-temperature" min="0" max="1.5" step="0.05" value="0.3"
+                         oninput="document.getElementById('temp-val').textContent = this.value">
+                  <span class="range-value" id="temp-val">0.3</span>
+                </div>
+                <div class="form-hint">Lower = more focused, Higher = more creative</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Top P</label>
+                <div class="range-group">
+                  <input type="range" id="cfg-top-p" min="0" max="1" step="0.05" value="0.95"
+                         oninput="document.getElementById('topp-val').textContent = this.value">
+                  <span class="range-value" id="topp-val">0.95</span>
+                </div>
+                <div class="form-hint">Nucleus sampling threshold</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Max Tokens</label>
+                <input type="number" id="cfg-max-tokens" value="1024" min="1" max="32768">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="saveConfig()">Save Configuration</button>
+        </div>
+      </div>
+
+      <!-- ═══ TTS Settings ═══ -->
+      <div id="section-tts" class="config-section">
+        <h1 class="admin-page-title">Text-to-Speech Settings</h1>
+        <p class="admin-page-desc">Configure voice synthesis parameters.</p>
+
+        <div class="card">
+          <div class="card-header">TTS Configuration</div>
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="form-group">
+                <label class="form-label">TTS Model</label>
+                <select id="cfg-tts-model">
+                  <option value="voxtral-mini-tts-2603">voxtral-mini-tts-2603</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Voice ID</label>
+                <select id="cfg-voice-id">
+                  <option value="gb_jane_neutral">gb_jane_neutral (British Female)</option>
+                  <option value="us_john_neutral">us_john_neutral (US Male)</option>
+                  <option value="us_jane_neutral">us_jane_neutral (US Female)</option>
+                  <option value="gb_john_neutral">gb_john_neutral (British Male)</option>
+                  <option value="fr_marie_neutral">fr_marie_neutral (French Female)</option>
+                  <option value="fr_pierre_neutral">fr_pierre_neutral (French Male)</option>
+                </select>
+                <div class="form-hint">Preset voice for speech generation. Overridden by custom voice if uploaded.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Audio Format</label>
+                <select id="cfg-tts-format">
+                  <option value="wav">WAV</option>
+                  <option value="mp3">MP3</option>
+                  <option value="pcm">PCM</option>
+                  <option value="flac">FLAC</option>
+                  <option value="opus">Opus</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="saveConfig()">Save Configuration</button>
+        </div>
+      </div>
+
+      <!-- ═══ STT Settings ═══ -->
+      <div id="section-stt" class="config-section">
+        <h1 class="admin-page-title">Speech-to-Text Settings</h1>
+        <p class="admin-page-desc">Configure transcription parameters.</p>
+
+        <div class="card">
+          <div class="card-header">STT Configuration</div>
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="form-group">
+                <label class="form-label">STT Model</label>
+                <select id="cfg-stt-model">
+                  <option value="voxtral-mini-latest">voxtral-mini-latest</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Speaker Diarization</label>
+                <select id="cfg-stt-diarize">
+                  <option value="false">Disabled</option>
+                  <option value="true">Enabled</option>
+                </select>
+                <div class="form-hint">Identify different speakers in the audio</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="saveConfig()">Save Configuration</button>
+        </div>
+      </div>
+
+      <!-- ═══ System Prompts ═══ -->
+      <div id="section-prompts" class="config-section">
+        <h1 class="admin-page-title">System Prompts</h1>
+        <p class="admin-page-desc">Configure the system instructions for the AI assistant.</p>
+
+        <div class="card">
+          <div class="card-header">English System Prompt</div>
+          <div class="card-body">
+            <div class="form-group">
+              <textarea id="cfg-prompt-en" rows="6" style="min-height: 120px;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">Arabic System Prompt</div>
+          <div class="card-body">
+            <div class="form-group">
+              <textarea id="cfg-prompt-ar" rows="6" style="min-height: 120px; direction: rtl; text-align: right;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <button class="btn btn-primary" onclick="saveConfig()">Save Configuration</button>
+        </div>
+      </div>
+
+      <!-- ═══ Voice Recording ═══ -->
+      <div id="section-voice" class="config-section">
+        <h1 class="admin-page-title">Custom Voice Recording</h1>
+        <p class="admin-page-desc">Record or upload a reference voice for TTS voice cloning.</p>
+
+        <div class="card">
+          <div class="card-header">Record Voice</div>
+          <div class="card-body">
+            <div class="voice-recorder" id="voiceRecorder">
+              <button class="record-btn" id="adminRecordBtn" onclick="toggleAdminRecording()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="23"/>
+                  <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+              </button>
+              <div class="voice-status" id="voiceRecordStatus">Click to start recording a reference voice</div>
+              <div id="voicePlayback" style="display:none;">
+                <audio id="voicePreview" controls></audio>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+          <div class="card-header">Upload Voice File</div>
+          <div class="card-body">
+            <div class="file-upload-area" onclick="document.getElementById('voiceFileInput').click()">
+              <input type="file" id="voiceFileInput" accept="audio/*" onchange="uploadVoiceFile(this)">
+              <p>Click to upload an audio file (.wav, .mp3, .webm)</p>
+              <p class="form-hint">This will be used as the reference voice for TTS</p>
+            </div>
+            <div style="margin-top: 12px;">
+              <button class="btn btn-danger btn-sm" onclick="deleteCustomVoice()">Remove Custom Voice</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Test Chat ═══ -->
+      <div id="section-test-chat" class="config-section">
+        <h1 class="admin-page-title">Test Chat</h1>
+        <p class="admin-page-desc">Test the chat model with custom parameters.</p>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select id="test-chat-model">
+                  <option value="mistral-small-latest">mistral-small-latest</option>
+                  <option value="mistral-medium-latest">mistral-medium-latest</option>
+                  <option value="mistral-large-latest">mistral-large-latest</option>
+                  <option value="open-mistral-nemo">open-mistral-nemo</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Temperature</label>
+                <div class="range-group">
+                  <input type="range" id="test-chat-temp" min="0" max="1.5" step="0.05" value="0.3"
+                         oninput="document.getElementById('test-temp-val').textContent = this.value">
+                  <span class="range-value" id="test-temp-val">0.3</span>
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">System Prompt</label>
+                <textarea id="test-chat-system" rows="3">You are a helpful government services assistant for Digital Dubai Authority.</textarea>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">User Message</label>
+                <textarea id="test-chat-message" rows="2" placeholder="Type a test message...">How do I apply for a business license in Dubai?</textarea>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="testChat()" id="testChatBtn">Run Test</button>
+
+            <div class="test-panel" id="testChatResult" style="display:none;">
+              <div class="test-result-label">Response</div>
+              <div class="test-result" id="testChatOutput"></div>
+              <div class="stats-grid" id="testChatStats"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Test TTS ═══ -->
+      <div id="section-test-tts" class="config-section">
+        <h1 class="admin-page-title">Test Text-to-Speech</h1>
+        <p class="admin-page-desc">Generate speech from text with custom parameters.</p>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="form-group">
+                <label class="form-label">TTS Model</label>
+                <select id="test-tts-model">
+                  <option value="voxtral-mini-tts-2603">voxtral-mini-tts-2603</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Voice</label>
+                <select id="test-tts-voice">
+                  <option value="gb_jane_neutral">gb_jane_neutral</option>
+                  <option value="us_john_neutral">us_john_neutral</option>
+                  <option value="us_jane_neutral">us_jane_neutral</option>
+                  <option value="gb_john_neutral">gb_john_neutral</option>
+                  <option value="fr_marie_neutral">fr_marie_neutral</option>
+                  <option value="fr_pierre_neutral">fr_pierre_neutral</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Format</label>
+                <select id="test-tts-format">
+                  <option value="wav">WAV</option>
+                  <option value="mp3">MP3</option>
+                  <option value="pcm">PCM</option>
+                  <option value="flac">FLAC</option>
+                  <option value="opus">Opus</option>
+                </select>
+              </div>
+              <div class="form-group full-width">
+                <label class="form-label">Text to Speak</label>
+                <textarea id="test-tts-text" rows="3">Welcome to Digital Dubai Authority. How can I assist you today?</textarea>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="testTTS()" id="testTTSBtn">Generate Speech</button>
+
+            <div class="test-panel" id="testTTSResult" style="display:none;">
+              <div class="test-result-label">Audio Output</div>
+              <audio id="testTTSAudio" controls style="width: 100%; margin-top: 8px;"></audio>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Test STT ═══ -->
+      <div id="section-test-stt" class="config-section">
+        <h1 class="admin-page-title">Test Speech-to-Text</h1>
+        <p class="admin-page-desc">Transcribe audio with custom parameters.</p>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="config-grid">
+              <div class="form-group">
+                <label class="form-label">STT Model</label>
+                <select id="test-stt-model">
+                  <option value="voxtral-mini-latest">voxtral-mini-latest</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Diarization</label>
+                <select id="test-stt-diarize">
+                  <option value="false">Disabled</option>
+                  <option value="true">Enabled</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <div class="voice-recorder" id="testSTTRecorder">
+                <button class="record-btn" id="testSTTRecordBtn" onclick="toggleTestSTTRecording()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                </button>
+                <div id="testSTTStatus">Click to record audio for transcription</div>
+              </div>
+
+              <div style="margin-top: 12px;">
+                <div class="file-upload-area" onclick="document.getElementById('testSTTFile').click()">
+                  <input type="file" id="testSTTFile" accept="audio/*" onchange="testSTTFromFile(this)">
+                  <p>Or upload an audio file to transcribe</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="test-panel" id="testSTTResult" style="display:none;">
+              <div class="test-result-label">Transcription</div>
+              <div class="test-result" id="testSTTOutput"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/static/js/admin.js"></script>
+</body>
+</html>

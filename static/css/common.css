@@ -1,0 +1,395 @@
+/* Digital Dubai Authority Brand Colors
+   Extracted from digitaldubai.ae
+   Primary Blue: #0072BC (DDA signature blue)
+   Light Blue: #00A4E4
+   Dark Blue: #004B87
+   Accent Blue: #E8F4FD
+   White: #FFFFFF
+   Light Gray: #F4F7FA
+   Text: #333333
+*/
+
+:root {
+  --dda-blue: #0072BC;
+  --dda-blue-light: #00A4E4;
+  --dda-blue-dark: #004B87;
+  --dda-blue-deeper: #003366;
+  --dda-blue-pale: #E8F4FD;
+  --dda-blue-hover: #005A96;
+  --dda-white: #FFFFFF;
+  --dda-bg: #F4F7FA;
+  --dda-bg-card: #FFFFFF;
+  --dda-text: #333333;
+  --dda-text-light: #6B7280;
+  --dda-text-muted: #9CA3AF;
+  --dda-border: #D1E3F0;
+  --dda-border-light: #E8EFF5;
+  --dda-error: #DC3545;
+  --dda-success: #28A745;
+  --dda-gold: #C4A35A;
+  --shadow-sm: 0 1px 3px rgba(0,114,188,0.08);
+  --shadow-md: 0 4px 12px rgba(0,114,188,0.1);
+  --shadow-lg: 0 10px 30px rgba(0,114,188,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.2s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--dda-bg);
+  color: var(--dda-text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* RTL support */
+body.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+
+.header {
+  background: linear-gradient(135deg, var(--dda-blue) 0%, var(--dda-blue-light) 100%);
+  color: white;
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,114,188,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-logo {
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.5px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.header-subtitle {
+  font-size: 12px;
+  opacity: 0.85;
+  font-weight: 400;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-nav a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.header-nav a:hover,
+.header-nav a.active {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--dda-blue);
+  color: white;
+}
+.btn-primary:hover {
+  background: var(--dda-blue-hover);
+  box-shadow: 0 2px 8px rgba(0,114,188,0.3);
+}
+
+.btn-secondary {
+  background: var(--dda-blue-dark);
+  color: white;
+}
+.btn-secondary:hover {
+  background: var(--dda-blue-deeper);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--dda-blue);
+  border: 1.5px solid var(--dda-blue);
+}
+.btn-outline:hover {
+  background: var(--dda-blue);
+  color: white;
+}
+
+.btn-danger {
+  background: var(--dda-error);
+  color: white;
+}
+.btn-danger:hover {
+  background: #C82333;
+}
+
+.btn-success {
+  background: var(--dda-success);
+  color: white;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Form Controls ──────────────────────────────────────────────────────── */
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dda-text);
+  margin-bottom: 6px;
+}
+
+.form-hint {
+  font-size: 12px;
+  color: var(--dda-text-light);
+  margin-top: 4px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="range"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--dda-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  background: white;
+  color: var(--dda-text);
+  transition: var(--transition);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--dda-blue);
+  box-shadow: 0 0 0 3px rgba(0,114,188,0.12);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+select {
+  cursor: pointer;
+}
+
+input[type="range"] {
+  padding: 0;
+  border: none;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--dda-border);
+  border-radius: 3px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--dda-blue);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,114,188,0.3);
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--dda-bg-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--dda-border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--dda-border-light);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--dda-blue-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* ─── Status Indicators ─────────────────────────────────────────────────── */
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.active {
+  background: var(--dda-success);
+  box-shadow: 0 0 6px rgba(40,167,69,0.4);
+}
+
+.status-dot.inactive {
+  background: var(--dda-text-light);
+}
+
+/* ─── Toast / Notifications ──────────────────────────────────────────────── */
+
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease;
+  max-width: 400px;
+}
+
+.toast-success {
+  background: var(--dda-success);
+  color: white;
+}
+
+.toast-error {
+  background: var(--dda-error);
+  color: white;
+}
+
+.toast-info {
+  background: var(--dda-blue);
+  color: white;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ─── Loading ────────────────────────────────────────────────────────────── */
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--dda-border);
+  border-top-color: var(--dda-blue);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% { content: ''; }
+  40% { content: '.'; }
+  60% { content: '..'; }
+  80%, 100% { content: '...'; }
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 16px;
+  }
+  .header-subtitle {
+    display: none;
+  }
+}
