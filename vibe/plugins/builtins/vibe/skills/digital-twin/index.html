@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You — Digital Twin Console</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-2: #161b22;
+    --bg-3: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --accent-2: #a371f7;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --red: #f85149;
+    --radius: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+  /* ---------- Sidebar ---------- */
+  aside {
+    width: 220px;
+    background: var(--bg-2);
+    border-right: 1px solid var(--border);
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-shrink: 0;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px 18px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .brand .orb {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--green), var(--accent));
+    animation: spin 6s linear infinite;
+    box-shadow: 0 0 14px rgba(88,166,255,.5);
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: background .15s, color .15s;
+  }
+  .nav-btn:hover { background: var(--bg-3); color: var(--text); }
+  .nav-btn.active { background: var(--bg-3); color: var(--text); }
+  .nav-btn .dot { width: 8px; height: 8px; border-radius: 3px; background: currentColor; opacity: .7; }
+  .sidebar-footer { margin-top: auto; font-size: 11px; color: var(--muted); padding: 0 8px; line-height: 1.6; }
+  /* ---------- Main ---------- */
+  main { flex: 1; padding: 24px 28px 60px; max-width: 1200px; }
+  header.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .topbar h1 { font-size: 22px; font-weight: 700; }
+  .topbar .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .role-picker {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .view { display: none; }
+  .view.active { display: block; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } }
+  /* ---------- Cards ---------- */
+  .grid { display: grid; gap: 16px; }
+  .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 900px) { .grid.cols-3, .grid.cols-4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .grid.cols-2, .grid.cols-3, .grid.cols-4 { grid-template-columns: 1fr; } aside { display: none; } }
+  .card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+  }
+  .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .card h3 .count { margin-left: auto; font-size: 11px; color: var(--muted); font-weight: 400; }
+  .stat-value { font-size: 30px; font-weight: 700; line-height: 1.1; }
+  .stat-label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  .trend { font-size: 12px; margin-top: 6px; }
+  .trend.up { color: var(--green); } .trend.down { color: var(--red); } .trend.flat { color: var(--muted); }
+  /* ---------- Twin card ---------- */
+  .twin-card {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    background: linear-gradient(135deg, rgba(88,166,255,.12), rgba(163,113,247,.12)), var(--bg-2);
+  }
+  .avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 700;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform .15s;
+  }
+  .avatar:hover { transform: scale(1.05); }
+  .ring-wrap { position: relative; width: 72px; height: 72px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-wrap .avatar { position: absolute; inset: 6px; width: auto; height: auto; font-size: 20px; }
+  .twin-meta { flex: 1; }
+  .twin-meta .name { font-size: 18px; font-weight: 700; }
+  .twin-meta .role { color: var(--muted); font-size: 13px; }
+  .twin-score { margin-top: 8px; font-size: 12px; color: var(--muted); }
+  .bar { height: 6px; background: var(--bg-3); border-radius: 3px; margin-top: 6px; overflow: hidden; max-width: 260px; }
+  .bar > div { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .6s ease; }
+  /* ---------- Connectors ---------- */
+  .connector {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    cursor: pointer;
+    transition: border-color .15s, transform .1s;
+  }
+  .connector:hover { border-color: var(--accent); }
+  .connector.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .connector .icon {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .connector .c-meta { flex: 1; min-width: 0; }
+  .connector .c-name { font-size: 13px; font-weight: 600; }
+  .connector .c-status { font-size: 11px; color: var(--muted); }
+  .connector .badge {
+    background: var(--red);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 2px 8px;
+  }
+  .connector .badge.zero { background: var(--bg-3); color: var(--muted); }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  /* ---------- Activity feed ---------- */
+  .feed-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-item .f-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .feed-item .f-body { flex: 1; min-width: 0; }
+  .feed-item .f-title { font-size: 13px; font-weight: 600; }
+  .feed-item .f-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .feed-item .f-time { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .feed-item.urgent { background: rgba(248,81,73,.06); border-radius: 8px; border-bottom-color: transparent; padding-left: 10px; }
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 8px;
+    background: var(--bg-3);
+    color: var(--muted);
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
+  .tag.urgent { background: rgba(248,81,73,.2); color: var(--red); }
+  .tag.action { background: rgba(88,166,255,.2); color: var(--accent); }
+  /* ---------- Action cards ---------- */
+  .action-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .action-card .a-head { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+  .action-card .a-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .action-card .a-meta { font-size: 11px; color: var(--muted); }
+  .btn-row { display: flex; gap: 8px; }
+  .btn {
+    border: 1px solid var(--border);
+    background: var(--bg-3);
+    color: var(--text);
+    border-radius: 7px;
+    padding: 7px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: filter .15s, background .15s;
+  }
+  .btn:hover { filter: brightness(1.2); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #0d1117; font-weight: 600; }
+  .btn.primary:hover { filter: brightness(1.1); }
+  .btn.ghost { background: transparent; }
+  .btn.done { opacity: .45; pointer-events: none; }
+  /* ---------- Focus timer ---------- */
+  .timer-display {
+    font-size: 56px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .timer-label { text-align: center; color: var(--muted); font-size: 13px; margin: 6px 0 18px; }
+  .timer-controls { display: flex; gap: 10px; justify-content: center; }
+  .preset-row { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+  /* ---------- Timeline ---------- */
+  .tl-item { display: flex; gap: 14px; padding: 10px 0; }
+  .tl-item .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); margin-top: 4px; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(88,166,255,.15); }
+  .tl-item .tl-body { font-size: 13px; }
+  .tl-item .tl-time { color: var(--muted); font-size: 11px; }
+  /* ---------- Toasts ---------- */
+  #toasts { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+  .toast {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    min-width: 260px;
+    max-width: 360px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+    animation: slidein .25s ease;
+  }
+  @keyframes slidein { from { opacity: 0; transform: translateX(20px); } }
+  .toast.info { border-left-color: var(--accent); }
+  /* ---------- Command palette ---------- */
+  #palette-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.55);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 12vh;
+    z-index: 200;
+  }
+  #palette-overlay.open { display: flex; }
+  #palette {
+    width: 100%;
+    max-width: 520px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  }
+  #palette input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 15px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  #palette-results { max-height: 300px; overflow-y: auto; }
+  .palette-item {
+    padding: 11px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+  }
+  .palette-item:hover, .palette-item.sel { background: var(--bg-3); }
+  .palette-item .hint { color: var(--muted); font-size: 11px; }
+  .empty-state { padding: 30px; text-align: center; color: var(--muted); font-size: 13px; }
+  .chart { display: flex; align-items: flex-end; gap: 6px; height: 90px; margin-top: 12px; }
+  .chart .bar-col { flex: 1; background: linear-gradient(180deg, var(--accent), rgba(88,166,255,.25)); border-radius: 4px 4px 0 0; min-height: 4px; transition: height .5s ease; position: relative; }
+  .chart .bar-col:hover::after {
+    content: attr(data-v);
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: var(--text); background: var(--bg-3); padding: 1px 6px; border-radius: 4px;
+  }
+  .chart-labels { display: flex; gap: 6px; margin-top: 6px; }
+  .chart-labels span { flex: 1; text-align: center; font-size: 10px; color: var(--muted); }
+  .kbd {
+    font-size: 10px; border: 1px solid var(--border); border-radius: 4px;
+    padding: 1px 5px; color: var(--muted); background: var(--bg-3);
+  }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="brand"><div class="orb"></div> Your Twin</div>
+  <button class="nav-btn active" data-view="overview"><span class="dot"></span> Overview</button>
+  <button class="nav-btn" data-view="actions"><span class="dot"></span> Action Center</button>
+  <button class="nav-btn" data-view="timeline"><span class="dot"></span> Timeline</button>
+  <button class="nav-btn" data-view="focus"><span class="dot"></span> Focus Mode</button>
+  <div class="sidebar-footer">
+    Press <span class="kbd">Ctrl</span>+<span class="kbd">K</span> for quick actions<br>
+    Simulated connectors · progress saved locally
+  </div>
+</aside>
+
+<main>
+  <header class="topbar">
+    <div>
+      <h1 id="page-title">Good to see you</h1>
+      <div class="sub" id="page-sub">Your digital twin across every connector</div>
+    </div>
+    <span id="api-status" style="font-size:12px; color:var(--muted)">● checking API…</span>
+    <select class="role-picker" id="role-picker" title="Your role shapes what your twin prioritizes">
+      <option value="eng-manager">Engineering Manager</option>
+      <option value="product-lead">Product Lead</option>
+      <option value="ic-engineer">Staff Engineer (IC)</option>
+      <option value="ops-lead">Operations Lead</option>
+      <option value="founder">Founder</option>
+    </select>
+  </header>
+
+  <!-- ================= OVERVIEW ================= -->
+  <section class="view active" id="view-overview">
+    <div class="grid cols-2">
+      <div class="card twin-card">
+        <div class="ring-wrap">
+          <svg width="72" height="72"><circle cx="36" cy="36" r="32" fill="none" stroke="#21262d" stroke-width="5"/><circle id="twin-ring" cx="36" cy="36" r="32" fill="none" stroke="url(#grad)" stroke-width="5" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="40"/>
+          <defs><linearGradient id="grad"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#a371f7"/></linearGradient></defs></svg>
+          <div class="avatar" id="avatar" title="Click to edit your name">You</div>
+        </div>
+        <div class="twin-meta">
+          <div class="name" id="twin-name">You</div>
+          <div class="role" id="twin-role">Engineering Manager</div>
+          <div class="twin-score" id="twin-score-label">Twin alignment: 80%</div>
+          <div class="bar"><div id="twin-bar" style="width:80%"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Today's brief <span class="count" id="brief-time"></span></h3>
+        <div id="brief-text" style="font-size:13px; line-height:1.7; color:var(--text)"></div>
+        <div class="btn-row" style="margin-top:14px">
+          <button class="btn primary" id="btn-read-brief">Mark brief as read</button>
+          <button class="btn ghost" id="btn-snooze-brief">Remind me at 4pm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cols-4" style="margin-top:16px" id="stat-row"></div>
+
+    <div class="grid cols-2" style="margin-top:16px">
+      <div class="card">
+        <h3>Connectors <span class="count">click to filter activity</span></h3>
+        <div id="connector-list" style="display:flex; flex-direction:column; gap:8px"></div>
+      </div>
+      <div class="card">
+        <h3>Live activity <span class="count" id="feed-count"></span></h3>
+        <div id="feed"><div class="empty-state">No activity yet</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Your week at a glance <span class="count">actions taken vs. received</span></h3>
+      <div class="chart" id="week-chart"></div>
+      <div class="chart-labels" id="week-labels"></div>
+    </div>
+  </section>
+
+  <!-- ================= ACTION CENTER ================= -->
+  <section class="view" id="view-actions">
+    <div class="grid cols-2" id="action-grid"></div>
+    <div class="card" style="margin-top:16px">
+      <h3>Completed today <span class="count" id="done-count">0 actions</span></h3>
+      <div id="done-list"><div class="empty-state">Nothing completed yet — your twin is watching</div></div>
+    </div>
+  </section>
+
+  <!-- ================= TIMELINE ================= -->
+  <section class="view" id="view-timeline">
+    <div class="card">
+      <h3>Everything your twin has done <span class="count">newest first</span></h3>
+      <div id="timeline"><div class="empty-state">No events yet</div></div>
+    </div>
+  </section>
+
+  <!-- ================= FOCUS ================= -->
+  <section class="view" id="view-focus">
+    <div class="card" style="max-width:560px; margin: 0 auto; text-align:center">
+      <h3 style="justify-content:center">Focus Mode</h3>
+      <div class="timer-display" id="timer-display">25:00</div>
+      <div class="timer-label" id="timer-label">Deep work block</div>
+      <div class="timer-controls">
+        <button class="btn primary" id="timer-toggle">Start</button>
+        <button class="btn ghost" id="timer-reset">Reset</button>
+      </div>
+      <div class="preset-row">
+        <button class="btn ghost" data-min="25">Pomodoro 25m</button>
+        <button class="btn ghost" data-min="50">Deep work 50m</button>
+        <button class="btn ghost" data-min="5">Break 5m</button>
+      </div>
+      <div style="margin-top:20px; text-align:left">
+        <h3>Suggested focus target</h3>
+        <div id="focus-target" style="font-size:13px; color:var(--muted); line-height:1.6"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toasts"></div>
+
+<div id="palette-overlay">
+  <div id="palette">
+    <input id="palette-input" placeholder="Type a command… (navigate, act, focus)" autocomplete="off">
+    <div id="palette-results"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================== STATE ============================== */
+
+const ROLE_CONFIG = {
+  "eng-manager": {
+    label: "Engineering Manager",
+    focusTarget: "Review the 2 pending PRs and unblock the deploy pipeline — your team is waiting on you.",
+    brief: (s) => `${s.stats.unread} unread messages, ${s.stats.pendingReviews} PRs awaiting your review, and ${s.stats.meetings} meetings today. The deploy pipeline has been red for 40 minutes — that's your first move.`,
+    twinScore: 82
+  },
+  "product-lead": {
+    label: "Product Lead",
+    focusTarget: "Draft the Q3 priority memo and reply to the two customer escalations before noon.",
+    brief: (s) => `Roadmap review at 2pm. ${s.stats.unread} unread messages, 2 customer escalations open, and ${s.stats.pendingReviews} items need your sign-off. Spec doc v3 is waiting on your comments.`,
+    twinScore: 76
+  },
+  "ic-engineer": {
+    label: "Staff Engineer (IC)",
+    focusTarget: "Finish the auth refactor branch and leave review comments on the payments PR.",
+    brief: (s) => `No meetings until 3pm — protect the block. ${s.stats.pendingReviews} PRs to review, ${s.stats.unread} unread messages, and the auth refactor is 2 commits from done.`,
+    twinScore: 88
+  },
+  "ops-lead": {
+    label: "Operations Lead",
+    focusTarget: "Triage the 3 open incidents and confirm the on-call handoff for tonight.",
+    brief: (s) => `2 incidents are paging right now. ${s.stats.unread} unread messages, on-call rotation swaps at 6pm, and last night's batch job needs a postmortem.`,
+    twinScore: 71
+  },
+  "founder": {
+    label: "Founder",
+    focusTarget: "Send the investor update and close the two open hiring loops.",
+    brief: (s) => `Investor update goes out Friday. ${s.stats.unread} unread messages, 2 candidates in final rounds, and runway is at 14 months — every decision this week counts.`,
+    twinScore: 84
+  }
+};
+
+const CONNECTOR_DEFS = [
+  { id: "gmail",   name: "Gmail",    icon: "@", color: "#ea4335", bg: "rgba(234,67,53,.18)" },
+  { id: "slack",   name: "Slack",    icon: "#", color: "#a371f7", bg: "rgba(163,113,247,.18)" },
+  { id: "calendar",name: "Calendar", icon: "31",color: "#58a6ff", bg: "rgba(88,166,255,.18)" },
+  { id: "github",  name: "GitHub",   icon: "G", color: "#e6edf3", bg: "rgba(230,237,243,.14)" },
+  { id: "jira",    name: "Jira",     icon: "J", color: "#d29922", bg: "rgba(210,153,34,.18)" },
+  { id: "drive",   name: "Drive",    icon: "▲", color: "#3fb950", bg: "rgba(63,185,80,.18)" },
+  { id: "notion",  name: "Notion",   icon: "N", color: "#e6edf3", bg: "rgba(230,237,243,.14)" }
+];
+
+const FEED_POOL = [
+  { c: "slack",   title: "#eng-deploys: deploy pipeline failed", desc: "CI is red on main — rollback or fix?", urgent: true, tag: "urgent" },
+  { c: "gmail",   title: "Customer escalation: Acme Corp", desc: "Enterprise customer reporting data sync delays", urgent: true, tag: "urgent" },
+  { c: "github",  title: "PR #482 opened: auth refactor", desc: "By you — 2 files changed, CI pending", tag: "action" },
+  { c: "github",  title: "Review requested: PR #479 payments", desc: "From @mira — needs your eyes", tag: "action" },
+  { c: "slack",   title: "@you mentioned in #product", desc: "“Can we ship the pricing page by Friday?”", tag: "action" },
+  { c: "calendar",title: "Standup in 15 min", desc: "Sprint board sync — 6 people attending", tag: "" },
+  { c: "jira",    title: "Sprint ticket moved to Blocked", desc: "OPS-2231 waiting on vendor API key", tag: "urgent" },
+  { c: "gmail",   title: "Weekly metrics digest", desc: "Activation +12% WoW, churn flat", tag: "" },
+  { c: "drive",   title: "“Q3 Roadmap v3” shared with you", desc: "Comments requested by EOD", tag: "action" },
+  { c: "notion",  title: "Doc updated: Incident postmortem", desc: "Last night's batch job failure", tag: "" },
+  { c: "slack",   title: "#hiring: 2 final-round candidates", desc: "Both available this week", tag: "action" },
+  { c: "calendar",title: "1:1 with Sam at 2:00pm", desc: "Recurring — your notes doc is attached", tag: "" },
+  { c: "github",  title: "Issue #91 assigned to you", desc: "“Investigate flaky test in checkout suite”", tag: "" },
+  { c: "gmail",   title: "Invoice #2201 due tomorrow", desc: "Cloud vendor — $4,820", tag: "urgent" }
+];
+
+const ACTION_POOL = {
+  "eng-manager": [
+    { icon: "▶", color: "#f85149", title: "Unblock the deploy pipeline", desc: "CI has been red for 40 min on main. Approve the hotfix PR or trigger a rollback.", meta: "GitHub · urgent · est. 10 min", primary: "Approve hotfix", secondary: "Rollback", log: "approved the deploy hotfix" },
+    { icon: "👀", color: "#58a6ff", title: "Review PR #479 (payments)", desc: "Mira is blocked until you leave review comments. 34 lines changed.", meta: "GitHub · est. 15 min", primary: "Open review", secondary: "Snooze 1h", log: "opened review on PR #479" },
+    { icon: "✉", color: "#ea4335", title: "Reply to Acme escalation", desc: "Draft a holding reply and loop in support. Enterprise SLA: 4h.", meta: "Gmail · urgent · est. 5 min", primary: "Send draft", secondary: "Draft only", log: "sent a holding reply to Acme Corp" },
+    { icon: "📅", color: "#58a6ff", title: "Prep sprint board for standup", desc: "3 tickets stalled > 5 days. Flag them before the 15-min sync.", meta: "Jira · est. 10 min", primary: "Flag stalled", secondary: "Skip", log: "flagged 3 stalled sprint tickets" }
+  ],
+  "product-lead": [
+    { icon: "📄", color: "#3fb950", title: "Comment on Q3 Roadmap v3", desc: "Drive doc has 6 open comments; 2 are blockers for the 2pm review.", meta: "Drive · est. 15 min", primary: "Open doc", secondary: "Snooze", log: "opened the Q3 roadmap doc to comment" },
+    { icon: "🚨", color: "#f85149", title: "Triage 2 customer escalations", desc: "Both enterprise accounts. One threatens churn this quarter.", meta: "Gmail · urgent", primary: "Triage now", secondary: "Delegate", log: "triaged 2 customer escalations" },
+    { icon: "✍", color: "#a371f7", title: "Draft Q3 priority memo", desc: "Your twin pre-drafted an outline from last week's threads.", meta: "Notion · est. 20 min", primary: "Start drafting", secondary: "Later", log: "started the Q3 priority memo" },
+    { icon: "💰", color: "#d29922", title: "Approve pricing page copy", desc: "Final copy is in #product awaiting your sign-off to ship Friday.", meta: "Slack · est. 5 min", primary: "Approve", secondary: "Request edits", log: "approved the pricing page copy" }
+  ],
+  "ic-engineer": [
+    { icon: "🔀", color: "#58a6ff", title: "Finish auth refactor branch", desc: "2 commits from done. No meetings until 3pm — protect the block.", meta: "GitHub · est. 45 min", primary: "Open branch", secondary: "Snooze", log: "opened the auth refactor branch" },
+    { icon: "👀", color: "#58a6ff", title: "Review payments PR #479", desc: "Mira asked directly. Focus on the retry logic in the webhook handler.", meta: "GitHub · est. 20 min", primary: "Open review", secondary: "Snooze 1h", log: "reviewed the payments PR" },
+    { icon: "🧪", color: "#d29922", title: "Fix flaky checkout test", desc: "Issue #91 assigned to you. Failing 1 in 5 runs on CI.", meta: "GitHub · est. 30 min", primary: "Open issue", secondary: "Snooze", log: "opened issue #91" },
+    { icon: "💬", color: "#a371f7", title: "Answer @you in #product", desc: "“Can we ship the pricing page by Friday?” — needs a yes/no with reasoning.", meta: "Slack · est. 5 min", primary: "Reply", secondary: "Snooze", log: "replied in #product" }
+  ],
+  "ops-lead": [
+    { icon: "🚨", color: "#f85149", title: "Triage 2 paging incidents", desc: "INC-441 (API latency) and INC-442 (queue backlog) are both SEV-2.", meta: "Jira · urgent", primary: "Open incidents", secondary: "Escalate", log: "opened both paging incidents" },
+    { icon: "🔄", color: "#58a6ff", title: "Confirm on-call handoff", desc: "Rotation swaps at 6pm. Verify the new primary acknowledged.", meta: "Slack · est. 5 min", primary: "Confirm", secondary: "Snooze", log: "confirmed the on-call handoff" },
+    { icon: "📝", color: "#a371f7", title: "Write batch job postmortem", desc: "Last night's failure is undocumented. Stakeholders expect it by EOD.", meta: "Notion · est. 25 min", primary: "Start postmortem", secondary: "Later", log: "started the batch job postmortem" },
+    { icon: "🔑", color: "#d29922", title: "Chase vendor API key", desc: "OPS-2231 has been blocked 3 days waiting on the vendor.", meta: "Gmail · est. 5 min", primary: "Send nudge", secondary: "Snooze", log: "nudged the vendor about the API key" }
+  ],
+  "founder": [
+    { icon: "📈", color: "#3fb950", title: "Send investor update", desc: "Draft is ready in your twin's queue. Runway: 14 months. Goes out Friday.", meta: "Gmail · est. 15 min", primary: "Review & send", secondary: "Edit first", log: "reviewed the investor update for sending" },
+    { icon: "👤", color: "#58a6ff", title: "Close 2 hiring loops", desc: "Both final-round candidates are available this week.", meta: "Slack · est. 20 min", primary: "Schedule finals", secondary: "Snooze", log: "scheduled final rounds with 2 candidates" },
+    { icon: "🚨", color: "#f85149", title: "Handle Acme escalation", desc: "Your largest account. A personal reply from you de-escalates it.", meta: "Gmail · urgent", primary: "Reply personally", secondary: "Delegate", log: "personally replied to the Acme escalation" },
+    { icon: "💳", color: "#d29922", title: "Approve cloud invoice", desc: "$4,820 due tomorrow. Autopay is off this month.", meta: "Gmail · est. 2 min", primary: "Approve payment", secondary: "Snooze", log: "approved the cloud invoice payment" }
+  ]
+};
+
+const STORE_KEY = "digital-twin-state-v1";
+
+const state = {
+  role: "eng-manager",
+  name: "You",
+  selectedConnector: null,
+  feed: [],
+  actions: [],
+  done: [],
+  timeline: [],
+  stats: { unread: 14, pendingReviews: 3, meetings: 4, focusMinutes: 95 },
+  briefRead: false,
+  weekData: [
+    { d: "Mon", sent: 18, recv: 26 }, { d: "Tue", sent: 22, recv: 31 },
+    { d: "Wed", sent: 15, recv: 24 }, { d: "Thu", sent: 27, recv: 38 },
+    { d: "Fri", sent: 12, recv: 19 }, { d: "Sat", sent: 3, recv: 5 },
+    { d: "Sun", sent: 2, recv: 4 }
+  ],
+  timer: { seconds: 25 * 60, running: false, interval: null, label: "Deep work block" }
+};
+
+/* ============================== HELPERS ============================== */
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => [...document.querySelectorAll(sel)];
+const connectorDef = (id) => CONNECTOR_DEFS.find(c => c.id === id);
+const iconFor = (id) => { const d = connectorDef(id); return `<span class="f-icon" style="background:${d.bg}; color:${d.color}">${d.icon}</span>`; };
+const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+function toast(msg, type = "success") {
+  const el = document.createElement("div");
+  el.className = "toast" + (type === "info" ? " info" : "");
+  el.textContent = msg;
+  $("#toasts").appendChild(el);
+  setTimeout(() => { el.style.opacity = "0"; el.style.transition = "opacity .3s"; setTimeout(() => el.remove(), 300); }, 3200);
+}
+
+function logTimeline(text) {
+  state.timeline.unshift({ time: now(), text });
+  renderTimeline();
+  save();
+}
+
+function relativeTime(minAgo) {
+  if (minAgo < 1) return "just now";
+  if (minAgo < 60) return minAgo + "m ago";
+  return Math.floor(minAgo / 60) + "h ago";
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      v: 1,
+      day: new Date().toDateString(),
+      role: state.role,
+      name: state.name,
+      feed: state.feed,
+      actions: state.actions,
+      done: state.done,
+      timeline: state.timeline,
+      stats: state.stats,
+      briefRead: state.briefRead,
+      timerSeconds: state.timer.seconds,
+      timerLabel: state.timer.label,
+      selectedConnector: state.selectedConnector
+    }));
+    syncToBackend();
+  } catch (e) { /* storage unavailable */ }
+}
+
+let syncTimer = null;
+function syncToBackend() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => {
+    if (location.protocol === "file:") return;
+    fetch("/api/state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: "twin", value: {
+        role: state.role, name: state.name, feed: state.feed, actions: state.actions,
+        done: state.done, timeline: state.timeline, stats: state.stats, briefRead: state.briefRead
+      }})
+    }).then(() => setApiStatus(true)).catch(() => setApiStatus(false));
+  }, 500);
+}
+
+function setApiStatus(online) {
+  const el = $("#api-status");
+  if (!el) return;
+  el.textContent = online ? "● API synced" : "● offline (local only)";
+  el.style.color = online ? "var(--green)" : "var(--yellow)";
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data || data.v !== 1) return false;
+    const isNewDay = data.day !== new Date().toDateString();
+    state.role = data.role || state.role;
+    state.name = data.name || state.name;
+    state.feed = Array.isArray(data.feed) ? data.feed : state.feed;
+    state.actions = Array.isArray(data.actions) ? data.actions : state.actions;
+    state.done = isNewDay ? [] : (Array.isArray(data.done) ? data.done : []);
+    state.timeline = Array.isArray(data.timeline) ? data.timeline : state.timeline;
+    state.stats = data.stats || state.stats;
+    state.briefRead = !isNewDay && !!data.briefRead;
+    state.selectedConnector = data.selectedConnector || null;
+    if (typeof data.timerSeconds === "number" && data.timerSeconds > 0) {
+      state.timer.seconds = data.timerSeconds;
+      state.timer.label = data.timerLabel || "Deep work block";
+    }
+    if (isNewDay) state.timeline.unshift({ time: now(), text: "New day — your twin synced 7 connectors" });
+    return true;
+  } catch (e) { return false; }
+}
+
+/* ============================== RENDERERS ============================== */
+
+function renderTwin() {
+  const cfg = ROLE_CONFIG[state.role];
+  $("#twin-name").textContent = state.name;
+  $("#twin-role").textContent = cfg.label;
+  $("#avatar").textContent = state.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  $("#twin-score-label").textContent = `Twin alignment: ${cfg.twinScore}% — acting on today's priorities raises it`;
+  $("#twin-bar").style.width = cfg.twinScore + "%";
+  $("#twin-ring").setAttribute("stroke-dashoffset", (201 * (1 - cfg.twinScore / 100)).toFixed(1));
+  $("#brief-text").textContent = cfg.brief(state);
+  $("#focus-target").textContent = cfg.focusTarget;
+  if (state.briefRead) {
+    const b = $("#btn-read-brief");
+    b.classList.add("done");
+    b.textContent = "Brief read ✓";
+  }
+}
+
+function renderStats() {
+  const s = state.stats;
+  const defs = [
+    { v: s.unread, l: "Unread messages", t: "down", tc: "↓ 3 vs yesterday" },
+    { v: s.pendingReviews, l: "Awaiting your review", t: "up", tc: "↑ 1 since standup" },
+    { v: s.meetings, l: "Meetings today", t: "flat", tc: "2 back-to-back at 2pm" },
+    { v: s.focusMinutes, l: "Focus minutes", t: "up", tc: "↑ 25 vs avg" }
+  ];
+  $("#stat-row").innerHTML = defs.map(d => `
+    <div class="card">
+      <div class="stat-value">${d.v}</div>
+      <div class="stat-label">${d.l}</div>
+      <div class="trend ${d.t}">${d.tc}</div>
+    </div>`).join("");
+}
+
+const connectorLinked = {};
+
+function fetchConnectorStatus() {
+  if (location.protocol === "file:") { setApiStatus(false); return; }
+  fetch("/api/connectors").then(r => r.json()).then(list => {
+    list.forEach(c => { connectorLinked[c.id] = c.connected; });
+    renderConnectors();
+    setApiStatus(true);
+    if (connectorLinked.github) fetchProviderActivity("/api/github/activity", "github", githubActionFor);
+    if (connectorLinked.slack) fetchProviderActivity("/api/slack/activity", "slack", slackActionFor);
+    if (connectorLinked.gmail) fetchProviderActivity("/api/gmail/activity", "gmail", gmailActionFor);
+    if (connectorLinked.calendar) fetchProviderActivity("/api/calendar/activity", "calendar", calendarActionFor);
+    if (connectorLinked.drive) fetchProviderActivity("/api/drive/activity", "drive", driveActionFor);
+    if (connectorLinked.jira) fetchProviderActivity("/api/jira/activity", "jira", jiraActionFor);
+    if (connectorLinked.notion) fetchProviderActivity("/api/notion/activity", "notion", notionActionFor);
+  }).catch(() => setApiStatus(false));
+}
+
+function genericActionFor(icon, color, verb, logVerb) {
+  return (item) => ({
+    id: item.c + "-" + (item.id || item.key || item.ref),
+    ref: item.ref,
+    icon, color,
+    title: `${verb}: ${item.title}`,
+    desc: item.desc,
+    meta: `${item.c[0].toUpperCase() + item.c.slice(1)} · live`,
+    primary: "Open", secondary: "Snooze 1h",
+    log: `${logVerb} “${item.title}”`,
+    done: false
+  });
+}
+
+const calendarActionFor = genericActionFor("📅", "#58a6ff", "Join / prep", "prepped for");
+const driveActionFor = genericActionFor("📄", "#3fb950", "Review file", "opened");
+const jiraActionFor = genericActionFor("🎫", "#d29922", "Work ticket", "opened ticket");
+const notionActionFor = genericActionFor("📝", "#e6edf3", "Open page", "opened");
+
+const liveSeen = { github: new Set(), slack: new Set() };
+
+function githubActionFor(item) {
+  return {
+    id: "gh-" + item.number + "-" + item.repo,
+    ref: item.ref,
+    icon: "👀", color: "#58a6ff",
+    title: `Review ${item.repo}#${item.number}`,
+    desc: item.title.replace(/^Review requested: /, "") + " — requested via GitHub",
+    meta: `GitHub · live · ${item.repo}`,
+    primary: "Open PR", secondary: "Snooze 1h",
+    log: `opened review for ${item.repo}#${item.number}`,
+    done: false
+  };
+}
+
+function slackActionFor(item) {
+  return {
+    id: "sl-" + item.ts + "-" + item.channel,
+    ref: item.ref,
+    icon: "💬", color: "#a371f7",
+    title: `Reply to @${item.author} in #${item.channel}`,
+    desc: item.desc,
+    meta: `Slack · live · #${item.channel}`,
+    primary: "Open thread", secondary: "Snooze 1h",
+    log: `opened the thread in #${item.channel}`,
+    done: false
+  };
+}
+
+function gmailActionFor(item) {
+  return {
+    id: "gm-" + item.id,
+    ref: item.ref,
+    icon: "✉", color: "#ea4335",
+    title: `Reply: ${item.subject}`,
+    desc: `From ${item.fromName} — ${item.desc.split("— ")[1] || ""}`.trim(),
+    meta: `Gmail · live · unread`,
+    primary: "Open email", secondary: "Snooze 1h",
+    log: `opened email “${item.subject}”`,
+    done: false
+  };
+}
+
+async function fetchProviderActivity(endpoint, source, actionFor) {
+  if (location.protocol === "file:") return;
+  try {
+    const res = await fetch(endpoint);
+    if (!res.ok) return;
+    const data = await res.json();
+    let added = 0;
+    (data.feed || []).forEach(item => {
+      if (liveSeen[source].has(item.ref)) return;
+      liveSeen[source].add(item.ref);
+      state.feed.unshift({ ...item, time: "live" });
+      added++;
+      const actionKinds = ["review", "mention", "email", "event", "ticket"];
+      if (actionKinds.includes(item.kind) && !state.actions.some(a => a.ref === item.ref)) {
+        state.actions.unshift(actionFor(item));
+      }
+    });
+    if (added > 0) {
+      const name = { github: "GitHub", slack: "Slack", gmail: "Gmail", calendar: "Calendar", drive: "Drive", jira: "Jira", notion: "Notion" }[source] || source;
+      toast(`${added} live item${added > 1 ? "s" : ""} from ${name}`, "info");
+      logTimeline(`Synced ${added} live item(s) from ${name}`);
+      renderConnectors();
+      renderFeed();
+      renderActions();
+      save();
+    }
+  } catch (e) { /* network blip — next poll retries */ }
+}
+
+async function fetchGitHubActivity() {
+  return fetchProviderActivity("/api/github/activity", "github", githubActionFor);
+}
+
+function fetchGmailActivity() {
+  return fetchProviderActivity("/api/gmail/activity", "gmail", gmailActionFor);
+}
+
+const fetchCalendarActivity = () => fetchProviderActivity("/api/calendar/activity", "calendar", calendarActionFor);
+const fetchDriveActivity = () => fetchProviderActivity("/api/drive/activity", "drive", driveActionFor);
+const fetchJiraActivity = () => fetchProviderActivity("/api/jira/activity", "jira", jiraActionFor);
+const fetchNotionActivity = () => fetchProviderActivity("/api/notion/activity", "notion", notionActionFor);
+
+function fetchSlackActivity() {
+  return fetchProviderActivity("/api/slack/activity", "slack", slackActionFor);
+}
+
+function renderConnectors() {
+  $("#connector-list").innerHTML = CONNECTOR_DEFS.map(c => {
+    const n = state.feed.filter(f => f.c === c.id).length;
+    const urgent = state.feed.some(f => f.c === c.id && f.urgent);
+    const linked = connectorLinked[c.id];
+    return `
+    <div class="connector ${state.selectedConnector === c.id ? "selected" : ""}" data-c="${c.id}">
+      <div class="icon" style="background:${c.bg}; color:${c.color}">${c.icon}</div>
+      <div class="c-meta">
+        <div class="c-name">${c.name} ${linked ? '<span style="color:var(--green)" title="Connected via API">⬢</span>' : '<span style="color:var(--muted)" title="Simulated — set credentials in .env">○</span>'}</div>
+        <div class="c-status">${urgent ? "● needs attention" : (linked ? "● live" : "● simulated")}</div>
+      </div>
+      <span class="badge ${n === 0 ? "zero" : ""}">${n || ""}</span>
+    </div>`;
+  }).join("");
+  $$("#connector-list .connector").forEach(el => {
+    el.addEventListener("click", () => {
+      state.selectedConnector = state.selectedConnector === el.dataset.c ? null : el.dataset.c;
+      save();
+      renderConnectors();
+      renderFeed();
+    });
+  });
+}
+
+function renderFeed() {
+  const items = state.selectedConnector
+    ? state.feed.filter(f => f.c === state.selectedConnector)
+    : state.feed;
+  $("#feed-count").textContent = `${items.length} item${items.length !== 1 ? "s" : ""}${state.selectedConnector ? " in " + connectorDef(state.selectedConnector).name : ""}`;
+  if (!items.length) { $("#feed").innerHTML = `<div class="empty-state">Nothing here — all quiet</div>`; return; }
+  $("#feed").innerHTML = items.map(f => `
+    <div class="feed-item ${f.urgent ? "urgent" : ""}">
+      ${iconFor(f.c)}
+      <div class="f-body">
+        <div class="f-title">${f.title}${f.tag ? `<span class="tag ${f.tag}">${f.tag}</span>` : ""}</div>
+        <div class="f-desc">${f.desc}</div>
+      </div>
+      <div class="f-time">${f.time}</div>
+    </div>`).join("");
+}
+
+function renderWeekChart() {
+  const max = Math.max(...state.weekData.map(d => d.recv));
+  $("#week-chart").innerHTML = state.weekData.map(d =>
+    `<div class="bar-col" data-v="${d.sent} sent / ${d.recv} recv" style="height:${Math.round(d.recv / max * 100)}%" title="${d.d}"></div>`).join("");
+  $("#week-labels").innerHTML = state.weekData.map(d => `<span>${d.d}</span>`).join("");
+}
+
+function renderActions() {
+  const pool = ACTION_POOL[state.role];
+  const open = state.actions.filter(a => !a.done);
+  $("#action-grid").innerHTML = open.length ? open.map(a => `
+    <div class="action-card" data-id="${a.id}">
+      <div class="a-head"><span style="font-size:18px">${a.icon}</span> ${a.title}</div>
+      <div class="a-desc">${a.desc}</div>
+      <div class="a-meta">${a.meta}</div>
+      <div class="btn-row">
+        <button class="btn primary" data-act="primary">${a.primary}</button>
+        <button class="btn ghost" data-act="secondary">${a.secondary}</button>
+      </div>
+    </div>`).join("") : `<div class="empty-state" style="grid-column:1/-1">All caught up — your twin handled everything for ${ROLE_CONFIG[state.role].label}s today</div>`;
+  $$("#action-grid .action-card").forEach(card => {
+    const action = state.actions.find(a => a.id === card.dataset.id);
+    card.querySelector('[data-act="primary"]').addEventListener("click", () => completeAction(action, "primary"));
+    card.querySelector('[data-act="secondary"]').addEventListener("click", () => completeAction(action, "secondary"));
+  });
+  $("#done-count").textContent = `${state.done.length} action${state.done.length !== 1 ? "s" : ""}`;
+  $("#done-list").innerHTML = state.done.length
+    ? state.done.map(a => `<div class="feed-item">${iconFor("notion")}<div class="f-body"><div class="f-title">✓ ${a.title}</div><div class="f-desc">${a.resolution}</div></div><div class="f-time">${a.completedAt}</div></div>`).join("")
+    : `<div class="empty-state">Nothing completed yet — your twin is watching</div>`;
+}
+
+function renderTimeline() {
+  $("#timeline").innerHTML = state.timeline.length
+    ? state.timeline.map(t => `<div class="tl-item"><div class="tl-dot"></div><div class="tl-body">${t.text}<div class="tl-time">${t.time}</div></div></div>`).join("")
+    : `<div class="empty-state">No events yet</div>`;
+}
+
+function renderAll() {
+  renderTwin();
+  renderStats();
+  renderConnectors();
+  renderFeed();
+  renderWeekChart();
+  renderActions();
+  renderTimeline();
+}
+
+/* ============================== ACTIONS ============================== */
+
+function completeAction(action, which) {
+  action.done = true;
+  action.resolution = which === "primary" ? action.log : `snoozed “${action.title}”`;
+  action.completedAt = now();
+  state.done.unshift(action);
+  state.stats.focusMinutes += 8;
+  toast(which === "primary" ? `Done — you ${action.log}` : `Snoozed “${action.title}”`, which === "primary" ? "success" : "info");
+  logTimeline(which === "primary" ? `You ${action.log}` : `Snoozed action: ${action.title}`);
+  save();
+  renderActions();
+  renderStats();
+}
+
+function initActions() {
+  state.actions = ACTION_POOL[state.role].map((a, i) => ({ ...a, id: state.role + "-" + i, done: false }));
+  state.done = [];
+}
+
+/* ============================== NAV ============================== */
+
+const TITLES = {
+  overview: ["Good to see you", "Your digital twin across every connector"],
+  actions: ["Action Center", "Everything that needs you, ranked by urgency"],
+  timeline: ["Timeline", "Every move you and your twin have made"],
+  focus: ["Focus Mode", "One thing at a time — your twin guards the rest"]
+};
+
+$$(".nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    $$(".nav-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    $$(".view").forEach(v => v.classList.remove("active"));
+    $("#view-" + btn.dataset.view).classList.add("active");
+    $("#page-title").textContent = TITLES[btn.dataset.view][0];
+    $("#page-sub").textContent = TITLES[btn.dataset.view][1];
+    window.scrollTo({ top: 0 });
+  });
+});
+
+function gotoView(name) {
+  $(`.nav-btn[data-view="${name}"]`).click();
+}
+
+/* ============================== TIMER ============================== */
+
+function fmtTimer(s) {
+  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function renderTimer() {
+  $("#timer-display").textContent = fmtTimer(state.timer.seconds);
+  $("#timer-label").textContent = state.timer.label;
+  $("#timer-toggle").textContent = state.timer.running ? "Pause" : "Start";
+}
+
+$("#timer-toggle").addEventListener("click", () => {
+  if (state.timer.running) {
+    clearInterval(state.timer.interval);
+    state.timer.running = false;
+    toast("Focus block paused", "info");
+  } else {
+    state.timer.running = true;
+    state.timer.interval = setInterval(() => {
+      state.timer.seconds--;
+      if (state.timer.seconds <= 0) {
+        clearInterval(state.timer.interval);
+        state.timer.running = false;
+        state.timer.seconds = 0;
+        state.stats.focusMinutes += 25;
+        toast("Focus block complete — nice work. Time for a break.");
+        logTimeline("Completed a focus block");
+        renderStats();
+        save();
+      }
+      renderTimer();
+      if (state.timer.seconds % 15 === 0) save();
+    }, 1000);
+    toast("Focus block started — notifications held by your twin", "info");
+  }
+  save();
+  renderTimer();
+});
+
+$("#timer-reset").addEventListener("click", () => {
+  clearInterval(state.timer.interval);
+  state.timer.running = false;
+  state.timer.seconds = 25 * 60;
+  state.timer.label = "Deep work block";
+  save();
+  renderTimer();
+});
+
+$$(".preset-row .btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    clearInterval(state.timer.interval);
+    state.timer.running = false;
+    state.timer.seconds = parseInt(btn.dataset.min) * 60;
+    state.timer.label = btn.textContent;
+    save();
+    renderTimer();
+  });
+});
+
+/* ============================== COMMAND PALETTE ============================== */
+
+const COMMANDS = [
+  { label: "Go to Overview", hint: "navigate", run: () => gotoView("overview") },
+  { label: "Go to Action Center", hint: "navigate", run: () => gotoView("actions") },
+  { label: "Go to Timeline", hint: "navigate", run: () => gotoView("timeline") },
+  { label: "Go to Focus Mode", hint: "navigate", run: () => gotoView("focus") },
+  { label: "Start / pause focus timer", hint: "focus", run: () => { gotoView("focus"); $("#timer-toggle").click(); } },
+  { label: "Mark today's brief as read", hint: "action", run: () => { toast("Brief marked as read"); logTimeline("Marked today's brief as read"); } },
+  { label: "Simulate new activity", hint: "demo", run: () => { pushFeedItem(); toast("New activity arrived", "info"); } },
+  { label: "Sync all connectors", hint: "demo", run: () => { toast("All 7 connectors synced"); logTimeline("Synced all connectors"); renderConnectors(); fetchGitHubActivity(); fetchSlackActivity(); fetchGmailActivity();
+        fetchCalendarActivity(); fetchDriveActivity(); fetchJiraActivity(); fetchNotionActivity(); } },
+  { label: "Reset twin (clear saved data)", hint: "danger", run: () => { localStorage.removeItem(STORE_KEY); toast("Saved data cleared — reloading", "info"); setTimeout(() => location.reload(), 600); } }
+];
+
+const palette = $("#palette-overlay");
+const paletteInput = $("#palette-input");
+let paletteSel = 0;
+let paletteFiltered = COMMANDS;
+
+function renderPalette() {
+  const q = paletteInput.value.toLowerCase();
+  paletteFiltered = COMMANDS.filter(c => c.label.toLowerCase().includes(q));
+  paletteSel = 0;
+  $("#palette-results").innerHTML = paletteFiltered.length
+    ? paletteFiltered.map((c, i) => `<div class="palette-item ${i === 0 ? "sel" : ""}" data-i="${i}"><span>${c.label}</span><span class="hint">${c.hint}</span></div>`).join("")
+    : `<div class="empty-state">No commands match</div>`;
+  $$("#palette-results .palette-item").forEach(el => {
+    el.addEventListener("click", () => runPaletteCommand(+el.dataset.i));
+  });
+}
+
+function runPaletteCommand(i) {
+  closePalette();
+  paletteFiltered[i].run();
+}
+
+function openPalette() { palette.classList.add("open"); paletteInput.value = ""; renderPalette(); paletteInput.focus(); }
+function closePalette() { palette.classList.remove("open"); }
+
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); palette.classList.contains("open") ? closePalette() : openPalette(); }
+  if (e.key === "Escape") closePalette();
+  if (palette.classList.contains("open") && paletteFiltered.length) {
+    if (e.key === "ArrowDown") { e.preventDefault(); paletteSel = (paletteSel + 1) % paletteFiltered.length; renderPalette(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); paletteSel = (paletteSel - 1 + paletteFiltered.length) % paletteFiltered.length; renderPalette(); }
+    if (e.key === "Enter") { e.preventDefault(); runPaletteCommand(paletteSel); }
+  }
+});
+paletteInput.addEventListener("input", renderPalette);
+palette.addEventListener("click", (e) => { if (e.target === palette) closePalette(); });
+
+/* ============================== PROFILE ============================== */
+
+$("#avatar").addEventListener("click", () => {
+  const name = prompt("What should your twin call you?", state.name);
+  if (name && name.trim() && name.trim() !== state.name) {
+    state.name = name.trim();
+    renderTwin();
+    save();
+    toast(`Twin updated — hello, ${state.name}`);
+    logTimeline(`Renamed the twin to “${state.name}”`);
+  }
+});
+
+/* ============================== BRIEF BUTTONS ============================== */
+
+$("#btn-read-brief").addEventListener("click", (e) => {
+  state.briefRead = true;
+  save();
+  toast("Brief marked as read");
+  logTimeline("Marked today's brief as read");
+  e.target.classList.add("done");
+  e.target.textContent = "Brief read ✓";
+});
+
+$("#btn-snooze-brief").addEventListener("click", () => {
+  toast("Your twin will re-surface the brief at 4:00pm", "info");
+  logTimeline("Snoozed today's brief until 4:00pm");
+});
+
+/* ============================== ROLE PICKER ============================== */
+
+$("#role-picker").addEventListener("change", (e) => {
+  state.role = e.target.value;
+  initActions();
+  save();
+  renderAll();
+  toast(`Twin re-tuned for role: ${ROLE_CONFIG[state.role].label}`, "info");
+  logTimeline(`Switched role to ${ROLE_CONFIG[state.role].label}`);
+});
+
+/* ============================== SIMULATION ============================== */
+
+function pushFeedItem(item) {
+  const f = item || FEED_POOL[Math.floor(Math.random() * FEED_POOL.length)];
+  const minutesAgo = Math.floor(Math.random() * 90);
+  state.feed.unshift({
+    ...f,
+    time: minutesAgo < 1 ? "just now" : relativeTime(minutesAgo),
+    urgent: f.urgent || Math.random() < 0.15
+  });
+  renderConnectors();
+  renderFeed();
+}
+
+/* ============================== INIT ============================== */
+
+$("#brief-time").textContent = new Date().toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" });
+
+const restored = load();
+$("#role-picker").value = state.role;
+
+// Seed a realistic morning
+if (!restored || state.feed.length === 0) {
+  FEED_POOL.slice(0, 9).forEach((f, i) => {
+    state.feed.push({ ...f, time: relativeTime(8 + i * 11), urgent: !!f.urgent });
+  });
+}
+
+if (!restored) initActions();
+if (!restored) state.timeline.push({ time: now(), text: "Your twin came online and synced 7 connectors" });
+logTimeline("Opened the console");
+
+renderAll();
+renderTimer();
+fetchConnectorStatus();
+setInterval(() => {
+  fetchGitHubActivity(); fetchSlackActivity(); fetchGmailActivity();
+  fetchCalendarActivity(); fetchDriveActivity(); fetchJiraActivity(); fetchNotionActivity();
+}, 5 * 60 * 1000);
+
+// Live simulation: new activity every 45–90s
+setInterval(() => {
+  if (Math.random() < 0.6) {
+    pushFeedItem();
+    toast("New activity in " + connectorDef(state.feed[0].c).name, "info");
+  }
+}, 60000);
+</script>
+</body>
+</html>

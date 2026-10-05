@@ -1,0 +1,15 @@
+{
+  "name": "digital-twin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal digital twin console: visual, interactive command center across GitHub, Slack, Gmail, Calendar, Drive, Jira, Notion.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --check server.js && node --check lib/github.js && node --check lib/slack.js && node --check lib/gmail.js && node --check lib/googleAuth.js && node --check lib/calendar.js && node --check lib/drive.js && node --check lib/jira.js && node --check lib/notion.js && node --test \"test/*.test.js\""
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
