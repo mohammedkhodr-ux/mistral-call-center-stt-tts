@@ -124,7 +124,7 @@ return `501` with instructions until a provider is connected.
 
 - `index.html` — the whole app (UI + logic, no build)
 - `server.js` — Express backend: static hosting + state API + connector status
-- `lib/` — one testable client per provider (`github`, `slack`, `gmail`,
+- `providers/` — one testable client per provider (`github`, `slack`, `gmail`,
   `googleAuth`, `calendar`, `drive`, `jira`, `notion`)
 - `test/` — node:test suites per client (`npm test`, 64 tests)
 - `data/store.json` — backend-side persisted state (gitignored)

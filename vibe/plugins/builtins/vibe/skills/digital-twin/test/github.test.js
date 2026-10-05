@@ -9,7 +9,7 @@ const {
   mapAssigned,
   mapMention,
   GitHubError
-} = require("../lib/github");
+} = require("../providers/github");
 
 const prFixture = (over = {}) => ({
   title: "Fix flaky checkout test",

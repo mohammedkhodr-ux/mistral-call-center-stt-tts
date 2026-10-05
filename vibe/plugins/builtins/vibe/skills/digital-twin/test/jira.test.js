@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { createJiraClient, buildFeed, mapIssue, JiraError } = require("../lib/jira");
+const { createJiraClient, buildFeed, mapIssue, JiraError } = require("../providers/jira");
 
 const BASE = "https://acme.atlassian.net";
 

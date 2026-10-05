@@ -8,7 +8,7 @@ const {
   truncate,
   permalink,
   SlackError
-} = require("../lib/slack");
+} = require("../providers/slack");
 
 const BOT = "UBOT123";
 

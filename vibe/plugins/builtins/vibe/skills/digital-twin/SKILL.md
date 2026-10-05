@@ -26,7 +26,7 @@ backend (`server.js`) that talks to live provider APIs.
 SKILL.md          # this file
 index.html        # the whole frontend (no build step)
 server.js         # Express backend: static hosting + state API + provider sync
-lib/              # one testable client per provider (github, slack, gmail,
+providers/              # one testable client per provider (github, slack, gmail,
                   #   googleAuth, calendar, drive, jira, notion)
 test/             # node:test suites per client
 package.json      # npm start / npm test

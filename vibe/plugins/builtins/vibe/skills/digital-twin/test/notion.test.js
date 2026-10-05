@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { createNotionClient, buildFeed, mapPage, pageTitle, relative, NotionError } = require("../lib/notion");
+const { createNotionClient, buildFeed, mapPage, pageTitle, relative, NotionError } = require("../providers/notion");
 
 const NOW = new Date("2026-10-05T12:00:00Z");
 

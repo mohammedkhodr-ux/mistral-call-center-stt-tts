@@ -11,7 +11,7 @@ const {
   truncate,
   header,
   GmailError
-} = require("../lib/gmail");
+} = require("../providers/gmail");
 
 const messageFixture = (over = {}) => ({
   id: "18c1f2a3b4",

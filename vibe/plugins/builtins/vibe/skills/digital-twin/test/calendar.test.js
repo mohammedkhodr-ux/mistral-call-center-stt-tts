@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { createCalendarClient, buildFeed, mapEvent, shortTime } = require("../lib/calendar");
+const { createCalendarClient, buildFeed, mapEvent, shortTime } = require("../providers/calendar");
 
 const NOW = new Date("2026-10-05T10:00:00Z");
 

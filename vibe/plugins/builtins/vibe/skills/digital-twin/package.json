@@ -5,7 +5,7 @@
   "description": "Personal digital twin console: visual, interactive command center across GitHub, Slack, Gmail, Calendar, Drive, Jira, Notion.",
   "scripts": {
     "start": "node server.js",
-    "test": "node --check server.js && node --check lib/github.js && node --check lib/slack.js && node --check lib/gmail.js && node --check lib/googleAuth.js && node --check lib/calendar.js && node --check lib/drive.js && node --check lib/jira.js && node --check lib/notion.js && node --test \"test/*.test.js\""
+    "test": "node --check server.js && node --check providers/github.js && node --check providers/slack.js && node --check providers/gmail.js && node --check providers/googleAuth.js && node --check providers/calendar.js && node --check providers/drive.js && node --check providers/jira.js && node --check providers/notion.js && node --test \"test/*.test.js\""
   },
   "license": "UNLICENSED",
   "dependencies": {

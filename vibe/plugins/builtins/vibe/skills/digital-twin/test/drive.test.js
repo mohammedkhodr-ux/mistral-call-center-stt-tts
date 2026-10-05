@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { createDriveClient, buildFeed, mapFile, relative } = require("../lib/drive");
+const { createDriveClient, buildFeed, mapFile, relative } = require("../providers/drive");
 
 const NOW = new Date("2026-10-05T12:00:00Z");
 
